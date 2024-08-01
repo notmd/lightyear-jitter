@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::{
     color::palettes::tailwind,
     prelude::*,
@@ -16,7 +18,7 @@ use lightyear::{
         },
         server::{Replicate, ServerCommands, SyncTarget},
         AppComponentExt, ChannelDirection, ClientId, Deserialize, LeafwingInputPlugin, Mode,
-        NetworkTarget, Serialize, SharedConfig,
+        NetworkTarget, Serialize, SharedConfig, TickConfig,
     },
     server::{config::ServerConfig, plugin::ServerPlugins},
     utils::bevy::TransformLinearInterpolation,
@@ -30,6 +32,9 @@ fn main() {
             config: ServerConfig {
                 shared: SharedConfig {
                     mode: Mode::HostServer,
+                    tick: TickConfig {
+                        tick_duration: Duration::from_secs_f64(1.0 / 32.0),
+                    },
                     ..default()
                 },
                 ..default()
@@ -39,11 +44,17 @@ fn main() {
             config: ClientConfig {
                 shared: SharedConfig {
                     mode: Mode::HostServer,
+                    tick: TickConfig {
+                        tick_duration: Duration::from_secs_f64(1.0 / 32.0),
+                    },
                     ..default()
                 },
+
                 ..default()
             },
         });
+
+    app.insert_resource(Time::<Fixed>::from_hz(32.0));
 
     app.add_plugins(LeafwingInputPlugin::<PlayerActions>::default());
     app.add_plugins(VisualInterpolationPlugin::<Transform>::default());
@@ -80,7 +91,7 @@ fn set_up(
     commands.spawn(PbrBundle {
         mesh: meshes.add(Cuboid::new(2.0, 2., 2.)),
         material: materials.add(Color::Srgba(tailwind::YELLOW_400)),
-        transform: Transform::from_translation(Vec3::new(0., 10., 0.)),
+        transform: Transform::from_translation(Vec3::new(0., 1., 0.)),
         ..default()
     });
 
@@ -121,7 +132,8 @@ fn set_up(
         ))
         .with_children(|parent| {
             parent.spawn(Camera3dBundle {
-                transform: Transform::from_translation(Vec3::new(0., 10., 0.)),
+                transform: Transform::from_translation(Vec3::new(0., 10., 0.))
+                    .with_rotation(Quat::from_rotation_x(-0.5)),
                 ..default()
             });
         });

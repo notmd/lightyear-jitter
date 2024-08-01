@@ -1,0 +1,10 @@
+[package]
+name = "lightyear-jitter"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = "0.14.0"
+leafwing-input-manager = "0.14.0"
+lightyear = { version = "0.16.3", features = ["leafwing"] }
+serde = "1.0.204"
